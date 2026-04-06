@@ -7,7 +7,7 @@ import { StatusBadge } from "./ui/StatusBadge";
 
 type RoomsListProps = {
   rooms: Room[];
-  onOpen: (roomId: string) => void;
+  onOpen: (room: Room) => void;
 };
 
 export function RoomsList({ rooms, onOpen }: RoomsListProps) {
@@ -47,7 +47,7 @@ export function RoomsList({ rooms, onOpen }: RoomsListProps) {
             </dl>
             <Button
               variant="secondary"
-              onClick={() => onOpen(room.id)}
+              onClick={() => onOpen(room)}
               disabled={room.status === "closed" || room.status === "expired"}
             >
               {t("rooms.openRoom")}

@@ -109,7 +109,17 @@ export function LobbyPage() {
             {isLoadingRooms ? t("lobby.roomsLoading") : t("lobby.roomsTotal", { count: rooms.length })}
           </span>
         </div>
-        <RoomsList rooms={rooms} onOpen={(roomId) => navigate(`/rooms/${roomId}`)} />
+        <RoomsList
+          rooms={rooms}
+          onOpen={async (room) => {
+            try {
+              const joinedRoom = await joinRoom(room.code);
+              navigate(`/rooms/${joinedRoom.id}`);
+            } catch (error) {
+              pushToast(getErrorMessage(error, "errors.joinRoom"));
+            }
+          }}
+        />
       </section>
     </main>
   );
