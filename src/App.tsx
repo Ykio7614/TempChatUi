@@ -22,6 +22,7 @@ function AppNavigator() {
   const authStatus = useAuthStore((state) => state.status);
   const currentRoomId = useRoomsStore((state) => state.currentRoomId);
   const restoreAttemptedRef = useRef(false);
+  const showGlobalControls = authStatus === "authenticated" && location.pathname === "/";
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -50,24 +51,20 @@ function AppNavigator() {
 
   if (authStatus === "checking") {
     return (
-      <>
-        <div className="app-controls">
-          <ThemeSwitcher />
-          <LanguageSwitcher />
-        </div>
-        <main className="app-loader">
-          <Spinner label={t("app.restoringSession")} />
-        </main>
-      </>
+      <main className="app-loader">
+        <Spinner label={t("app.restoringSession")} />
+      </main>
     );
   }
 
   return (
     <>
-      <div className="app-controls">
-        <ThemeSwitcher />
-        {location.pathname.startsWith("/rooms/") ? null : <LanguageSwitcher />}
-      </div>
+      {showGlobalControls ? (
+        <div className="app-controls">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
+        </div>
+      ) : null}
       <Routes>
         <Route path="/" element={authStatus === "authenticated" ? <LobbyPage /> : <AuthPage />} />
         <Route
