@@ -1,5 +1,6 @@
 import { FormEvent, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { BrandLogo } from "../components/BrandLogo";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { useI18n } from "../hooks/useI18n";
@@ -46,6 +47,7 @@ export function AuthPage() {
   return (
     <main className="page page--centered">
       <Card className="hero-card">
+        <BrandLogo className="hero-card__brand" />
         <p className="eyebrow">{roomCode ? t("auth.inviteEyebrow") : t("auth.eyebrow")}</p>
         <h1>{roomCode ? t("auth.inviteTitle", { code: roomCode.toUpperCase() }) : t("auth.title")}</h1>
         <p className="hero-text">{roomCode ? t("auth.inviteDescription") : t("auth.description")}</p>

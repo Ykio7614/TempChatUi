@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { BrandLogo } from "../components/BrandLogo";
 import { MessageList } from "../components/MessageList";
 import { RoomComposer } from "../components/RoomComposer";
 import { RoomParticipants } from "../components/RoomParticipants";
@@ -98,7 +99,8 @@ export function RoomPage() {
       <section className="room-layout">
         <Card className="room-main">
           <header className="room-header">
-            <div>
+            <div className="room-header__title">
+              <BrandLogo compact className="room-header__brand" />
               <p className="eyebrow">{t("room.code")}</p>
               <h1>{currentRoom.code}</h1>
               <p className="muted-text">{t("room.expires", { date: formatDateTime(currentRoom.expiresAt, locale) })}</p>

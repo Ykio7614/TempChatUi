@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BrandLogo } from "../components/BrandLogo";
 import { RoomsList } from "../components/RoomsList";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
@@ -55,7 +56,8 @@ export function LobbyPage() {
   return (
     <main className="page page--lobby">
       <section className="page-header">
-        <div>
+        <div className="page-header__intro">
+          <BrandLogo compact />
           <p className="eyebrow">{t("lobby.eyebrow")}</p>
           <h1>{t("lobby.welcomeBack", { nickname: currentUser?.nickname ?? "" })}</h1>
           <p className="muted-text">{t("lobby.description")}</p>
