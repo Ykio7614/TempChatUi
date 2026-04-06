@@ -1,62 +1,69 @@
 import type { CurrentUser, RoomParticipant, RoomStatus, WsStatus } from "../types/api";
+import type { TranslationKey } from "./i18n";
 
 export function cn(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(" ");
 }
 
-export function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
+type TranslateFn = (key: TranslationKey, params?: Record<string, string | number>) => string;
+
+export function formatDateTime(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
 }
 
-export function formatTime(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
+export function formatTime(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
 }
 
-export function formatRoomStatus(status: RoomStatus) {
+export function formatRoomStatus(status: RoomStatus, t: TranslateFn) {
   switch (status) {
     case "active":
-      return "Active";
+      return t("status.room.active");
     case "closed":
-      return "Closed";
+      return t("status.room.closed");
     case "expired":
-      return "Expired";
+      return t("status.room.expired");
     case "waiting":
     default:
-      return "Waiting";
+      return t("status.room.waiting");
   }
 }
 
-export function formatWsStatus(status: WsStatus) {
+export function formatWsStatus(status: WsStatus, t: TranslateFn) {
   switch (status) {
     case "connected":
-      return "Connected";
+      return t("status.ws.connected");
     case "connecting":
-      return "Connecting";
+      return t("status.ws.connecting");
     case "disconnected":
     default:
-      return "Offline";
+      return t("status.ws.disconnected");
   }
 }
 
-export function formatParticipantLabel(userId: string, currentUser: CurrentUser | null) {
+export function formatConnectionStatus(status: "connected" | "left", t: TranslateFn) {
+  return status === "connected" ? t("status.connection.connected") : t("status.connection.left");
+}
+
+export function formatParticipantLabel(userId: string, currentUser: CurrentUser | null, t: TranslateFn) {
   if (currentUser?.id === userId) {
-    return `${currentUser.nickname} (You)`;
+    return t("participant.you", { nickname: currentUser.nickname });
   }
 
-  return `User ${userId.slice(0, 8)}`;
+  return t("participant.user", { id: userId.slice(0, 8) });
 }
 
-export function participantSummary(participant: RoomParticipant, currentUser: CurrentUser | null) {
-  const base = formatParticipantLabel(participant.userId, currentUser);
+export function participantSummary(participant: RoomParticipant, currentUser: CurrentUser | null, t: TranslateFn) {
+  const base = formatParticipantLabel(participant.userId, currentUser, t);
 
   if (participant.role === "host") {
-    return `${base} · Host`;
+    return t("participant.host", { name: base });
   }
 
   return base;

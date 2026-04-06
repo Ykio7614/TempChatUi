@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useI18n } from "../hooks/useI18n";
 import type { ChatMessage, CurrentUser } from "../types/api";
 import { formatParticipantLabel, formatTime } from "../utils/format";
 
@@ -8,6 +9,7 @@ type MessageListProps = {
 };
 
 export function MessageList({ messages, currentUser }: MessageListProps) {
+  const { locale, t } = useI18n();
   const tailRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -18,8 +20,8 @@ export function MessageList({ messages, currentUser }: MessageListProps) {
     <div className="message-list">
       {messages.length === 0 ? (
         <div className="message-list__empty">
-          <p>No messages yet.</p>
-          <span>Say hello to start the room.</span>
+          <p>{t("messages.emptyTitle")}</p>
+          <span>{t("messages.emptyDescription")}</span>
         </div>
       ) : (
         messages.map((message) => {
@@ -28,8 +30,8 @@ export function MessageList({ messages, currentUser }: MessageListProps) {
           return (
             <article key={message.id} className={`message-bubble ${isOwn ? "message-bubble--own" : ""}`}>
               <header className="message-bubble__header">
-                <strong>{formatParticipantLabel(message.senderUserId, currentUser)}</strong>
-                <span>{formatTime(message.createdAt)}</span>
+                <strong>{formatParticipantLabel(message.senderUserId, currentUser, t)}</strong>
+                <span>{formatTime(message.createdAt, locale)}</span>
               </header>
               <p>{message.text}</p>
             </article>

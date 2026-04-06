@@ -1,5 +1,6 @@
+import { useI18n } from "../hooks/useI18n";
 import type { CurrentUser, RoomParticipant } from "../types/api";
-import { formatDateTime, participantSummary } from "../utils/format";
+import { formatConnectionStatus, formatDateTime, participantSummary } from "../utils/format";
 import { Card } from "./ui/Card";
 import { StatusBadge } from "./ui/StatusBadge";
 
@@ -10,24 +11,26 @@ type RoomParticipantsProps = {
 };
 
 export function RoomParticipants({ participants, currentUser, typingUserIds }: RoomParticipantsProps) {
+  const { locale, t } = useI18n();
+
   return (
     <Card className="sidebar-card">
       <div className="section-header">
-        <h3 className="section-title">Participants</h3>
+        <h3 className="section-title">{t("participants.title")}</h3>
         <span className="section-caption">{participants.length}</span>
       </div>
       <ul className="participant-list">
         {participants.map((participant) => (
           <li key={participant.userId} className="participant-list__item">
             <div>
-              <strong>{participantSummary(participant, currentUser)}</strong>
+              <strong>{participantSummary(participant, currentUser, t)}</strong>
               <p className="muted-text">
-                Last seen {formatDateTime(participant.lastSeenAt)}
-                {typingUserIds.includes(participant.userId) ? " · typing..." : ""}
+                {t("participants.lastSeen", { date: formatDateTime(participant.lastSeenAt, locale) })}
+                {typingUserIds.includes(participant.userId) ? ` · ${t("participants.typing")}` : ""}
               </p>
             </div>
             <StatusBadge
-              label={participant.connectionStatus}
+              label={formatConnectionStatus(participant.connectionStatus, t)}
               tone={participant.connectionStatus === "connected" ? "success" : "neutral"}
             />
           </li>

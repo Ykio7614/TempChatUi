@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useI18n } from "./useI18n";
 import { wsClient } from "../services/wsClient";
 import { useAuthStore } from "../store/authStore";
 import { useChatStore } from "../store/chatStore";
@@ -9,6 +10,7 @@ import { getErrorMessage } from "../utils/errors";
 
 export function useRoomSocket(roomId: string | undefined, enabled: boolean) {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const accessToken = useAuthStore((state) => state.accessToken);
   const currentUserId = useAuthStore((state) => state.currentUser?.id);
   const setWsStatus = useChatStore((state) => state.setWsStatus);
@@ -51,11 +53,11 @@ export function useRoomSocket(roomId: string | undefined, enabled: boolean) {
         case "room.closed":
           setCurrentRoom(null);
           useChatStore.getState().reset();
-          pushToast("Room was closed by the host.");
+          pushToast(t("room.closedByHost"));
           navigate("/", { replace: true });
           break;
         case "error":
-          pushToast(getErrorMessage(new Error(event.payload.message), event.payload.message));
+          pushToast(getErrorMessage(new Error(event.payload.message)));
           break;
         default:
           break;
@@ -82,6 +84,7 @@ export function useRoomSocket(roomId: string | undefined, enabled: boolean) {
     setCurrentRoom,
     setTyping,
     setWsStatus,
+    t,
   ]);
 
   return {

@@ -1,3 +1,6 @@
+import { getCurrentLanguage } from "../store/languageStore";
+import { translate, type TranslationKey } from "./i18n";
+
 export class ApiError extends Error {
   readonly status: number;
   readonly data: unknown;
@@ -10,24 +13,27 @@ export class ApiError extends Error {
   }
 }
 
-const STATUS_MESSAGES: Record<number, string> = {
-  400: "Check the entered values.",
-  401: "Session expired. Please sign in again.",
-  403: "You do not have access to this room.",
-  404: "Room not found.",
-  409: "Комната заполнена",
-  410: "Комната больше недоступна",
-  429: "Достигнут лимит комнат",
+const STATUS_MESSAGES: Record<number, TranslationKey> = {
+  400: "errors.badRequest",
+  401: "errors.unauthorized",
+  403: "errors.forbidden",
+  404: "errors.notFound",
+  409: "errors.roomFull",
+  410: "errors.roomUnavailable",
+  429: "errors.roomLimit",
 };
 
-export function getErrorMessage(error: unknown, fallback = "Something went wrong.") {
+export function getErrorMessage(error: unknown, fallback: TranslationKey = "errors.generic") {
+  const language = getCurrentLanguage();
+
   if (error instanceof ApiError) {
-    return STATUS_MESSAGES[error.status] ?? error.message;
+    const key = STATUS_MESSAGES[error.status];
+    return key ? translate(language, key) : error.message;
   }
 
   if (error instanceof Error && error.message) {
     return error.message;
   }
 
-  return fallback;
+  return translate(language, fallback);
 }

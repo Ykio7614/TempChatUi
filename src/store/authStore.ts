@@ -4,9 +4,11 @@ import { apiClient } from "../services/apiClient";
 import type { AuthStatus, AuthTokens, CurrentUser } from "../types/api";
 import { clearStoredTokens, getStoredTokens, setStoredTokens } from "../utils/storage";
 import { useChatStore } from "./chatStore";
+import { getCurrentLanguage } from "./languageStore";
 import { useRoomsStore } from "./roomsStore";
 import { registerStoreResetter } from "./storeReset";
 import { useUiStore } from "./uiStore";
+import { translate } from "../utils/i18n";
 
 type AuthState = {
   status: AuthStatus;
@@ -111,7 +113,7 @@ apiClient.configure({
     useAuthStore.getState().syncTokens(tokens);
   },
   onAuthFailure() {
-    useUiStore.getState().pushToast("Session expired. Please sign in again.");
+    useUiStore.getState().pushToast(translate(getCurrentLanguage(), "errors.unauthorized"));
     useAuthStore.getState().clearSession();
   },
 });

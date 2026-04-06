@@ -7,6 +7,7 @@ import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { Spinner } from "../components/ui/Spinner";
 import { StatusBadge } from "../components/ui/StatusBadge";
+import { useI18n } from "../hooks/useI18n";
 import { useRoomSocket } from "../hooks/useRoomSocket";
 import { roomsService } from "../services/roomsService";
 import { useAuthStore } from "../store/authStore";
@@ -20,6 +21,7 @@ type RoomLoadState = "loading" | "ready" | "error";
 
 export function RoomPage() {
   const navigate = useNavigate();
+  const { locale, t } = useI18n();
   const { roomId } = useParams();
   const currentUser = useAuthStore((state) => state.currentUser);
   const currentRoom = useRoomsStore((state) => state.currentRoom);
@@ -64,7 +66,7 @@ export function RoomPage() {
         useRoomsStore.getState().setCurrentRoom(null);
         resetChat();
         setLoadState("error");
-        pushToast(getErrorMessage(error, "Could not open room."));
+        pushToast(getErrorMessage(error, "errors.openRoom"));
         navigate("/", { replace: true });
       });
 
@@ -79,7 +81,7 @@ export function RoomPage() {
   if (loadState === "loading" || !currentRoom) {
     return (
       <main className="page page--centered">
-        <Spinner label="Loading room..." />
+        <Spinner label={t("room.loading")} />
       </main>
     );
   }
@@ -90,17 +92,17 @@ export function RoomPage() {
         <Card className="room-main">
           <header className="room-header">
             <div>
-              <p className="eyebrow">Room code</p>
+              <p className="eyebrow">{t("room.code")}</p>
               <h1>{currentRoom.code}</h1>
-              <p className="muted-text">Expires {formatDateTime(currentRoom.expiresAt)}</p>
+              <p className="muted-text">{t("room.expires", { date: formatDateTime(currentRoom.expiresAt, locale) })}</p>
             </div>
             <div className="room-header__meta">
               <StatusBadge
-                label={formatRoomStatus(currentRoom.status)}
+                label={formatRoomStatus(currentRoom.status, t)}
                 tone={currentRoom.status === "active" ? "success" : currentRoom.status === "waiting" ? "warning" : "neutral"}
               />
               <StatusBadge
-                label={formatWsStatus(wsStatus)}
+                label={formatWsStatus(wsStatus, t)}
                 tone={wsStatus === "connected" ? "success" : wsStatus === "connecting" ? "warning" : "danger"}
               />
             </div>
@@ -111,10 +113,12 @@ export function RoomPage() {
           <footer className="room-footer">
             {typingUserIds.length > 0 ? (
               <p className="typing-indicator">
-                {typingUserIds.length === 1 ? "1 participant is typing..." : `${typingUserIds.length} participants are typing...`}
+                {typingUserIds.length === 1
+                  ? t("room.typingOne", { count: typingUserIds.length })
+                  : t("room.typingMany", { count: typingUserIds.length })}
               </p>
             ) : (
-              <p className="typing-indicator typing-indicator--idle">No one is typing right now.</p>
+              <p className="typing-indicator typing-indicator--idle">{t("room.noTyping")}</p>
             )}
             <RoomComposer
               disabled={wsStatus !== "connected"}
@@ -122,7 +126,7 @@ export function RoomPage() {
                 try {
                   sendMessage(text);
                 } catch (error) {
-                  pushToast(getErrorMessage(error, "Could not send message."));
+                  pushToast(getErrorMessage(error, "errors.sendMessage"));
                 }
               }}
               onTypingStart={() => {
@@ -147,7 +151,7 @@ export function RoomPage() {
           <RoomParticipants participants={participants} currentUser={currentUser} typingUserIds={typingUserIds} />
           <Card className="sidebar-card">
             <div className="section-header">
-              <h3 className="section-title">Room actions</h3>
+              <h3 className="section-title">{t("room.actions")}</h3>
               <span className="section-caption">
                 {currentRoom.participantCount}/{currentRoom.maxParticipants}
               </span>
@@ -161,11 +165,11 @@ export function RoomPage() {
                     resetChat();
                     navigate("/", { replace: true });
                   } catch (error) {
-                    pushToast(getErrorMessage(error, "Could not leave room."));
+                    pushToast(getErrorMessage(error, "errors.leaveRoom"));
                   }
                 }}
               >
-                Leave room
+                {t("room.leave")}
               </Button>
               {isHost ? (
                 <Button
@@ -176,11 +180,11 @@ export function RoomPage() {
                       resetChat();
                       navigate("/", { replace: true });
                     } catch (error) {
-                      pushToast(getErrorMessage(error, "Could not close room."));
+                      pushToast(getErrorMessage(error, "errors.closeRoom"));
                     }
                   }}
                 >
-                  Close room
+                  {t("room.close")}
                 </Button>
               ) : null}
             </div>

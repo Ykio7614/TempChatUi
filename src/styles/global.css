@@ -71,6 +71,35 @@ a {
   padding: 32px 0 48px;
 }
 
+.language-switcher {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 30;
+  display: inline-flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 28px rgba(22, 33, 29, 0.12);
+  backdrop-filter: blur(16px);
+}
+
+.language-switcher__button {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 700;
+}
+
+.language-switcher__button--active {
+  background: var(--primary);
+  color: white;
+}
+
 .page--centered,
 .app-loader {
   min-height: 100vh;
@@ -509,6 +538,11 @@ a {
   .page {
     width: min(100% - 24px, 1200px);
     padding: 20px 0 32px;
+  }
+
+  .language-switcher {
+    top: 12px;
+    right: 12px;
   }
 
   .card {

@@ -1,8 +1,10 @@
 import type { AuthTokens } from "../types/api";
+import type { Language } from "../types/i18n";
 
 const ACCESS_TOKEN_KEY = "tempchat.accessToken";
 const REFRESH_TOKEN_KEY = "tempchat.refreshToken";
 const CURRENT_ROOM_KEY = "tempchat.currentRoomId";
+const LANGUAGE_KEY = "tempchat.language";
 
 function hasWindow() {
   return typeof window !== "undefined";
@@ -63,4 +65,21 @@ export function clearStoredCurrentRoomId() {
   }
 
   window.localStorage.removeItem(CURRENT_ROOM_KEY);
+}
+
+export function getStoredLanguage(): Language | null {
+  if (!hasWindow()) {
+    return null;
+  }
+
+  const value = window.localStorage.getItem(LANGUAGE_KEY);
+  return value === "ru" || value === "en" ? value : null;
+}
+
+export function setStoredLanguage(language: Language) {
+  if (!hasWindow()) {
+    return;
+  }
+
+  window.localStorage.setItem(LANGUAGE_KEY, language);
 }

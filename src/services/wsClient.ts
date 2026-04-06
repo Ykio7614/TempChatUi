@@ -7,10 +7,43 @@ function normalizeBaseUrl(value: string) {
   return value.replace(/\/+$/, "");
 }
 
-function toWsBaseUrl(httpBaseUrl: string) {
-  const url = new URL(httpBaseUrl);
-  url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
-  return normalizeBaseUrl(url.toString());
+function getWindowWsOrigin() {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return `${protocol}//${window.location.host}`;
+}
+
+function toWsBaseUrl(baseUrl: string) {
+  if (!baseUrl) {
+    return getWindowWsOrigin();
+  }
+
+  if (baseUrl.startsWith("http://") || baseUrl.startsWith("https://")) {
+    const url = new URL(baseUrl);
+    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+    return normalizeBaseUrl(url.toString());
+  }
+
+  if (baseUrl.startsWith("ws://") || baseUrl.startsWith("wss://")) {
+    return normalizeBaseUrl(baseUrl);
+  }
+
+  return `${getWindowWsOrigin()}${baseUrl.startsWith("/") ? baseUrl : `/${baseUrl}`}`;
+}
+
+function resolveWsBaseUrl() {
+  const configuredWsUrl = normalizeBaseUrl(import.meta.env.VITE_WS_BASE_URL ?? "");
+  const configuredApiUrl = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL ?? "");
+
+  // In local development we prefer the Vite proxy to keep websocket traffic same-origin.
+  if (import.meta.env.DEV) {
+    if (configuredWsUrl.startsWith("/")) {
+      return toWsBaseUrl(configuredWsUrl);
+    }
+
+    return getWindowWsOrigin();
+  }
+
+  return toWsBaseUrl(configuredWsUrl || configuredApiUrl);
 }
 
 class WsClient {
@@ -22,7 +55,7 @@ class WsClient {
   connect(roomId: string, accessToken: string) {
     this.disconnect();
 
-    const wsBaseUrl = normalizeBaseUrl(import.meta.env.VITE_WS_BASE_URL ?? toWsBaseUrl(import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"));
+    const wsBaseUrl = resolveWsBaseUrl();
     const url = new URL(`${wsBaseUrl}/ws/rooms/${roomId}`);
     url.searchParams.set("access_token", accessToken);
 

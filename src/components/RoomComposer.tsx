@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { useI18n } from "../hooks/useI18n";
 import { Button } from "./ui/Button";
 import { TextArea } from "./ui/TextArea";
 
@@ -10,6 +11,7 @@ type RoomComposerProps = {
 };
 
 export function RoomComposer({ disabled = false, onSend, onTypingStart, onTypingStop }: RoomComposerProps) {
+  const { t } = useI18n();
   const [message, setMessage] = useState("");
   const typingRef = useRef(false);
   const stopTimer = useRef<number | null>(null);
@@ -56,7 +58,7 @@ export function RoomComposer({ disabled = false, onSend, onTypingStart, onTyping
         rows={3}
         value={message}
         disabled={disabled}
-        placeholder="Write a message..."
+        placeholder={t("composer.placeholder")}
         onChange={(event) => {
           setMessage(event.target.value);
 
@@ -69,9 +71,9 @@ export function RoomComposer({ disabled = false, onSend, onTypingStart, onTyping
         }}
       />
       <div className="composer__actions">
-        <span className="muted-text">Messages are sent with the button so multiline text stays easy to write.</span>
+        <span className="muted-text">{t("composer.helper")}</span>
         <Button type="submit" disabled={disabled || !message.trim()}>
-          Send
+          {t("composer.send")}
         </Button>
       </div>
     </form>

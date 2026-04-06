@@ -29,8 +29,19 @@ function normalizeBaseUrl(value: string) {
   return value.replace(/\/+$/, "");
 }
 
+function resolveApiBaseUrl() {
+  const configuredBaseUrl = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL ?? "");
+
+  // In local development we prefer the Vite proxy to avoid CORS/preflight issues.
+  if (import.meta.env.DEV) {
+    return configuredBaseUrl.startsWith("/") ? configuredBaseUrl : "";
+  }
+
+  return configuredBaseUrl;
+}
+
 class ApiClient {
-  private readonly baseUrl = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080");
+  private readonly baseUrl = resolveApiBaseUrl();
   private refreshPromise: Promise<boolean> | null = null;
   private config: ApiClientConfig = {};
 
