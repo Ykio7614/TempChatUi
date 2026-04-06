@@ -4,9 +4,12 @@ const translations = {
   en: {
     "app.restoringSession": "Restoring session...",
     "common.language": "Language",
+    "common.theme": "Theme",
     "common.signOut": "Sign out",
     "language.english": "EN",
     "language.russian": "RU",
+    "theme.light": "Light",
+    "theme.dark": "Dark",
     "auth.eyebrow": "Temporary chat",
     "auth.title": "Join as a guest and spin up short-lived rooms in seconds.",
     "auth.description":
@@ -82,9 +85,12 @@ const translations = {
   ru: {
     "app.restoringSession": "Восстанавливаем сессию...",
     "common.language": "Язык",
+    "common.theme": "Тема",
     "common.signOut": "Выйти",
     "language.english": "EN",
     "language.russian": "RU",
+    "theme.light": "Светлая",
+    "theme.dark": "Темная",
     "auth.eyebrow": "Временный чат",
     "auth.title": "Войдите как гость и создавайте короткоживущие комнаты за секунды.",
     "auth.description":

@@ -1,11 +1,13 @@
 import { useEffect, useRef } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
+import { ThemeSwitcher } from "./components/ThemeSwitcher";
 import { ToastViewport } from "./components/ui/ToastViewport";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Spinner } from "./components/ui/Spinner";
 import { useAuthBootstrap } from "./hooks/useAuthBootstrap";
 import { useI18n } from "./hooks/useI18n";
+import { useTheme } from "./hooks/useTheme";
 import { AuthPage } from "./pages/AuthPage";
 import { LobbyPage } from "./pages/LobbyPage";
 import { RoomPage } from "./pages/RoomPage";
@@ -16,6 +18,7 @@ function AppNavigator() {
   const navigate = useNavigate();
   const location = useLocation();
   const { language, t } = useI18n();
+  const { theme } = useTheme();
   const authStatus = useAuthStore((state) => state.status);
   const currentRoomId = useRoomsStore((state) => state.currentRoomId);
   const restoreAttemptedRef = useRef(false);
@@ -23,6 +26,10 @@ function AppNavigator() {
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   useEffect(() => {
     if (authStatus !== "authenticated") {
@@ -44,7 +51,10 @@ function AppNavigator() {
   if (authStatus === "checking") {
     return (
       <>
-        <LanguageSwitcher />
+        <div className="app-controls">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
+        </div>
         <main className="app-loader">
           <Spinner label={t("app.restoringSession")} />
         </main>
@@ -54,7 +64,10 @@ function AppNavigator() {
 
   return (
     <>
-      {location.pathname.startsWith("/rooms/") ? null : <LanguageSwitcher />}
+      <div className="app-controls">
+        <ThemeSwitcher />
+        {location.pathname.startsWith("/rooms/") ? null : <LanguageSwitcher />}
+      </div>
       <Routes>
         <Route path="/" element={authStatus === "authenticated" ? <LobbyPage /> : <AuthPage />} />
         <Route

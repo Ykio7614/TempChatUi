@@ -1,10 +1,12 @@
 import type { AuthTokens } from "../types/api";
 import type { Language } from "../types/i18n";
+import type { Theme } from "../types/theme";
 
 const ACCESS_TOKEN_KEY = "tempchat.accessToken";
 const REFRESH_TOKEN_KEY = "tempchat.refreshToken";
 const CURRENT_ROOM_KEY = "tempchat.currentRoomId";
 const LANGUAGE_KEY = "tempchat.language";
+const THEME_KEY = "tempchat.theme";
 
 function hasWindow() {
   return typeof window !== "undefined";
@@ -82,4 +84,21 @@ export function setStoredLanguage(language: Language) {
   }
 
   window.localStorage.setItem(LANGUAGE_KEY, language);
+}
+
+export function getStoredTheme(): Theme | null {
+  if (!hasWindow()) {
+    return null;
+  }
+
+  const value = window.localStorage.getItem(THEME_KEY);
+  return value === "light" || value === "dark" ? value : null;
+}
+
+export function setStoredTheme(theme: Theme) {
+  if (!hasWindow()) {
+    return;
+  }
+
+  window.localStorage.setItem(THEME_KEY, theme);
 }
