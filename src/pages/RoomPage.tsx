@@ -36,6 +36,13 @@ export function RoomPage() {
   const resetChat = useChatStore((state) => state.reset);
   const pushToast = useUiStore((state) => state.pushToast);
   const [loadState, setLoadState] = useState<RoomLoadState>("loading");
+  const inviteLink = useMemo(() => {
+    if (typeof window === "undefined" || !currentRoom) {
+      return "";
+    }
+
+    return `${window.location.origin}/invite/${currentRoom.code}`;
+  }, [currentRoom]);
 
   const { sendMessage, startTyping, stopTyping } = useRoomSocket(roomId, loadState === "ready");
 
@@ -157,6 +164,19 @@ export function RoomPage() {
               </span>
             </div>
             <div className="stack-sm">
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(inviteLink);
+                    pushToast(t("room.linkCopied"));
+                  } catch {
+                    pushToast(inviteLink);
+                  }
+                }}
+              >
+                {t("room.copyLink")}
+              </Button>
               <Button
                 variant="secondary"
                 onClick={async () => {

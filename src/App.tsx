@@ -9,6 +9,7 @@ import { useAuthBootstrap } from "./hooks/useAuthBootstrap";
 import { useI18n } from "./hooks/useI18n";
 import { useTheme } from "./hooks/useTheme";
 import { AuthPage } from "./pages/AuthPage";
+import { InvitePage } from "./pages/InvitePage";
 import { LobbyPage } from "./pages/LobbyPage";
 import { RoomPage } from "./pages/RoomPage";
 import { useAuthStore } from "./store/authStore";
@@ -67,6 +68,7 @@ function AppNavigator() {
       ) : null}
       <Routes>
         <Route path="/" element={authStatus === "authenticated" ? <LobbyPage /> : <AuthPage />} />
+        <Route path="/invite/:roomCode" element={authStatus === "authenticated" ? <InvitePage /> : <AuthPage />} />
         <Route
           path="/rooms/:roomId"
           element={
