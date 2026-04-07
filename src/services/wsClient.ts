@@ -33,9 +33,10 @@ function toWsBaseUrl(baseUrl: string) {
 function resolveWsBaseUrl() {
   const configuredWsUrl = normalizeBaseUrl(import.meta.env.VITE_WS_BASE_URL ?? "");
   const configuredApiUrl = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL ?? "");
+  const configuredProxyTarget = normalizeBaseUrl(import.meta.env.VITE_DEV_PROXY_TARGET ?? "");
 
-  // In local development we prefer the Vite proxy to keep websocket traffic same-origin.
-  if (import.meta.env.DEV) {
+  // In local development we only force same-origin proxy mode when a proxy target is explicitly configured.
+  if (import.meta.env.DEV && configuredProxyTarget) {
     if (configuredWsUrl.startsWith("/")) {
       return toWsBaseUrl(configuredWsUrl);
     }

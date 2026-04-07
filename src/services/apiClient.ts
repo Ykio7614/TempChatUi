@@ -31,9 +31,10 @@ function normalizeBaseUrl(value: string) {
 
 function resolveApiBaseUrl() {
   const configuredBaseUrl = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL ?? "");
+  const configuredProxyTarget = normalizeBaseUrl(import.meta.env.VITE_DEV_PROXY_TARGET ?? "");
 
-  // In local development we prefer the Vite proxy to avoid CORS/preflight issues.
-  if (import.meta.env.DEV) {
+  // In local development we only force proxy mode when a proxy target is explicitly configured.
+  if (import.meta.env.DEV && configuredProxyTarget) {
     return configuredBaseUrl.startsWith("/") ? configuredBaseUrl : "";
   }
 
