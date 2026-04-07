@@ -71,7 +71,15 @@ jobs:
             set -e
             docker network create web >/dev/null 2>&1 || true
             cd "$SERVER_PATH"
-            docker compose -f docker-compose.prod.yml up -d --build
+            ENV_FILE=".env.prod"
+            if [ ! -f "$ENV_FILE" ]; then
+              ENV_FILE=".env"
+            fi
+            if [ ! -f "$ENV_FILE" ]; then
+              echo "Missing .env.prod or .env in $SERVER_PATH" >&2
+              exit 1
+            fi
+            docker compose --env-file "$ENV_FILE" -f docker-compose.prod.yml up -d --build
             docker image prune -f
-            docker compose -f docker-compose.prod.yml ps
+            docker compose --env-file "$ENV_FILE" -f docker-compose.prod.yml ps
           EOF

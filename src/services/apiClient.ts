@@ -29,6 +29,23 @@ function normalizeBaseUrl(value: string) {
   return value.replace(/\/+$/, "");
 }
 
+function isLocalHostname(hostname: string) {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]" || hostname.endsWith(".localhost");
+}
+
+function getDefaultApiBaseUrl() {
+  const { hostname, protocol } = window.location;
+
+  if (isLocalHostname(hostname)) {
+    return "";
+  }
+
+  const baseHostname = hostname.startsWith("www.") ? hostname.slice(4) : hostname;
+  const apiHostname = baseHostname.startsWith("api.") ? baseHostname : `api.${baseHostname}`;
+
+  return normalizeBaseUrl(`${protocol}//${apiHostname}`);
+}
+
 function resolveApiBaseUrl() {
   const configuredBaseUrl = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL ?? "");
   const configuredProxyTarget = normalizeBaseUrl(import.meta.env.VITE_DEV_PROXY_TARGET ?? "");
@@ -38,7 +55,7 @@ function resolveApiBaseUrl() {
     return configuredBaseUrl.startsWith("/") ? configuredBaseUrl : "";
   }
 
-  return configuredBaseUrl;
+  return configuredBaseUrl || getDefaultApiBaseUrl();
 }
 
 class ApiClient {
