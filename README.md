@@ -55,49 +55,59 @@ The app will be available on `http://localhost:5173`.
 ### Production
 
 1. Copy the production env template:
-
 ```bash
 cp .env.prod.example .env.prod
 ```
 
 2. Fill in:
 
-- `DOMAIN`
-- `ACME_EMAIL`
 - `VITE_API_BASE_URL`
 - `VITE_WS_BASE_URL`
-- optionally `FRONTEND_IMAGE` if you deploy a prebuilt image from CI
 
-3. Start the stack:
+3. Make sure the external Docker network exists on the server:
+
+```bash
+docker network create web || true
+```
+
+4. Start the stack:
 
 ```bash
 docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
 ```
 
-The production stack is:
-
-- `frontend`: static SPA served by nginx
-- `caddy`: HTTPS termination and reverse proxy with automatic certificates
+The production stack contains only the `tempchat-ui` container. HTTPS is expected to be terminated by the already running shared Caddy from the API stack.
 
 ## CI/CD
 
-A sample GitHub Actions workflow is included at:
+A GitHub Actions deploy workflow is included at:
 
-- `.github/workflows/docker-publish.yml`
+- `.github/workflows/deploy.yml`
 
-Assumptions:
+It follows the same pattern as the API repo:
 
-- source control is GitHub
-- images are published to GHCR
-- frontend build-time env values are stored as repository `Variables`:
-  - `VITE_API_BASE_URL`
-  - `VITE_WS_BASE_URL`
+- SSH into the server
+- `rsync` project files into `SERVER_PATH`
+- ensure shared Docker network `web` exists
+- run `docker compose -f docker-compose.prod.yml up -d --build`
 
-Typical server deploy flow after CI publishes an image:
+Required GitHub secrets:
+
+- `SERVER_HOST`
+- `SERVER_PORT`
+- `SERVER_USER`
+- `SERVER_PATH`
+- `SERVER_SSH_KEY`
+
+Recommended value:
+
+- `SERVER_PATH=/opt/tempchat-ui`
+
+Typical manual server deploy flow:
 
 ```bash
-docker compose --env-file .env.prod -f docker-compose.prod.yml pull
-docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --no-build
+docker network create web || true
+docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
 ```
 
 ## Environment
