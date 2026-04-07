@@ -67,7 +67,7 @@ jobs:
           SERVER_USER: ${{ secrets.SERVER_USER }}
           SERVER_PATH: ${{ secrets.SERVER_PATH }}
         run: |
-          ssh -p "${SERVER_PORT:-22}" "$SERVER_USER@$SERVER_HOST" << EOF
+          ssh -p "${SERVER_PORT:-22}" "$SERVER_USER@$SERVER_HOST" "SERVER_PATH='$SERVER_PATH' bash -s" << 'EOF'
             set -e
             docker network create web >/dev/null 2>&1 || true
             cd "$SERVER_PATH"
