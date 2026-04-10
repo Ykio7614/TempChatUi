@@ -1,16 +1,23 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useI18n } from "../hooks/useI18n";
 import { Button } from "./ui/Button";
 import { TextArea } from "./ui/TextArea";
 
 type RoomComposerProps = {
-  disabled?: boolean;
+  inputDisabled?: boolean;
+  sendDisabled?: boolean;
   onSend: (text: string) => void;
   onTypingStart: () => void;
   onTypingStop: () => void;
 };
 
-export function RoomComposer({ disabled = false, onSend, onTypingStart, onTypingStop }: RoomComposerProps) {
+export function RoomComposer({
+  inputDisabled = false,
+  sendDisabled = false,
+  onSend,
+  onTypingStart,
+  onTypingStop,
+}: RoomComposerProps) {
   const { t } = useI18n();
   const [message, setMessage] = useState("");
   const typingRef = useRef(false);
@@ -23,6 +30,21 @@ export function RoomComposer({ disabled = false, onSend, onTypingStart, onTyping
       }
     };
   }, []);
+
+  const submitMessage = () => {
+    const text = message.trim();
+    if (!text || inputDisabled || sendDisabled) {
+      return;
+    }
+
+    onSend(text);
+    setMessage("");
+
+    if (typingRef.current) {
+      typingRef.current = false;
+      onTypingStop();
+    }
+  };
 
   const scheduleTypingStop = () => {
     if (stopTimer.current) {
@@ -37,19 +59,16 @@ export function RoomComposer({ disabled = false, onSend, onTypingStart, onTyping
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    submitMessage();
+  };
 
-    const text = message.trim();
-    if (!text || disabled) {
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing) {
       return;
     }
 
-    onSend(text);
-    setMessage("");
-
-    if (typingRef.current) {
-      typingRef.current = false;
-      onTypingStop();
-    }
+    event.preventDefault();
+    submitMessage();
   };
 
   return (
@@ -57,8 +76,13 @@ export function RoomComposer({ disabled = false, onSend, onTypingStart, onTyping
       <TextArea
         rows={3}
         value={message}
-        disabled={disabled}
+        disabled={inputDisabled}
         placeholder={t("composer.placeholder")}
+        enterKeyHint="send"
+        autoCapitalize="sentences"
+        autoCorrect="on"
+        spellCheck
+        onKeyDown={handleKeyDown}
         onChange={(event) => {
           setMessage(event.target.value);
 
@@ -72,7 +96,7 @@ export function RoomComposer({ disabled = false, onSend, onTypingStart, onTyping
       />
       <div className="composer__actions">
         <span className="muted-text">{t("composer.helper")}</span>
-        <Button type="submit" disabled={disabled || !message.trim()}>
+        <Button type="submit" disabled={inputDisabled || sendDisabled || !message.trim()}>
           {t("composer.send")}
         </Button>
       </div>

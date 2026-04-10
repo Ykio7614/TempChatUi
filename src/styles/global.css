@@ -453,9 +453,11 @@ a {
   border: 1px solid var(--input-border);
   border-radius: 16px;
   padding: 13px 14px;
+  font-size: 16px;
   background: var(--input-bg);
   color: var(--text);
   outline: none;
+  -webkit-appearance: none;
   transition:
     border-color 140ms ease,
     box-shadow 140ms ease;
@@ -470,6 +472,7 @@ a {
 .textarea {
   resize: vertical;
   min-height: 108px;
+  -webkit-user-select: text;
 }
 
 .field {

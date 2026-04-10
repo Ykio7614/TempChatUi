@@ -44,6 +44,7 @@ export interface RoomsResponse {
 export interface RoomParticipant {
   roomId: string;
   userId: string;
+  nickname?: string;
   role: ParticipantRole;
   connectionStatus: ParticipantConnectionStatus;
   joinedAt: string;
