@@ -1,16 +1,21 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useI18n } from "../hooks/useI18n";
-import type { ChatMessage, CurrentUser } from "../types/api";
-import { formatParticipantLabel, formatTime } from "../utils/format";
+import type { ChatMessage, CurrentUser, RoomParticipant } from "../types/api";
+import { createParticipantNameMap, formatParticipantLabel, formatTime } from "../utils/format";
 
 type MessageListProps = {
   messages: ChatMessage[];
   currentUser: CurrentUser | null;
+  participants: RoomParticipant[];
 };
 
-export function MessageList({ messages, currentUser }: MessageListProps) {
+export function MessageList({ messages, currentUser, participants }: MessageListProps) {
   const { locale, t } = useI18n();
   const tailRef = useRef<HTMLDivElement | null>(null);
+  const participantNames = useMemo(
+    () => createParticipantNameMap(participants, currentUser, t),
+    [currentUser, participants, t],
+  );
 
   useEffect(() => {
     tailRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -30,7 +35,7 @@ export function MessageList({ messages, currentUser }: MessageListProps) {
           return (
             <article key={message.id} className={`message-bubble ${isOwn ? "message-bubble--own" : ""}`}>
               <header className="message-bubble__header">
-                <strong>{formatParticipantLabel(message.senderUserId, currentUser, t)}</strong>
+                <strong>{formatParticipantLabel(message.senderUserId, participantNames, currentUser, t)}</strong>
                 <span>{formatTime(message.createdAt, locale)}</span>
               </header>
               <p>{message.text}</p>

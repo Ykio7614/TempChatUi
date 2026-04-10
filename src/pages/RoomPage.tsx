@@ -117,7 +117,7 @@ export function RoomPage() {
             </div>
           </header>
 
-          <MessageList messages={messages} currentUser={currentUser} />
+          <MessageList messages={messages} currentUser={currentUser} participants={participants} />
 
           <footer className="room-footer">
             {typingUserIds.length > 0 ? (
@@ -130,7 +130,7 @@ export function RoomPage() {
               <p className="typing-indicator typing-indicator--idle">{t("room.noTyping")}</p>
             )}
             <RoomComposer
-              disabled={wsStatus !== "connected"}
+              sendDisabled={wsStatus !== "connected"}
               onSend={(text) => {
                 try {
                   sendMessage(text);

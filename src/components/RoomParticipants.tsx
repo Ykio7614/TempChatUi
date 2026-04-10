@@ -1,6 +1,7 @@
+import { useMemo } from "react";
 import { useI18n } from "../hooks/useI18n";
 import type { CurrentUser, RoomParticipant } from "../types/api";
-import { formatConnectionStatus, formatDateTime, participantSummary } from "../utils/format";
+import { createParticipantNameMap, formatConnectionStatus, formatDateTime, participantSummary } from "../utils/format";
 import { Card } from "./ui/Card";
 import { StatusBadge } from "./ui/StatusBadge";
 
@@ -12,6 +13,10 @@ type RoomParticipantsProps = {
 
 export function RoomParticipants({ participants, currentUser, typingUserIds }: RoomParticipantsProps) {
   const { locale, t } = useI18n();
+  const participantNames = useMemo(
+    () => createParticipantNameMap(participants, currentUser, t),
+    [currentUser, participants, t],
+  );
 
   return (
     <Card className="sidebar-card">
@@ -23,7 +28,7 @@ export function RoomParticipants({ participants, currentUser, typingUserIds }: R
         {participants.map((participant) => (
           <li key={participant.userId} className="participant-list__item">
             <div>
-              <strong>{participantSummary(participant, currentUser, t)}</strong>
+              <strong>{participantSummary(participant, participantNames, currentUser, t)}</strong>
               <p className="muted-text">
                 {t("participants.lastSeen", { date: formatDateTime(participant.lastSeenAt, locale) })}
                 {typingUserIds.includes(participant.userId) ? ` · ${t("participants.typing")}` : ""}
